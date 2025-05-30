@@ -1,0 +1,16 @@
+build/
+dist/
+*.egg-info/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+*.pt
+*.pth
+*.onnx
+*.jsonl
+*.csv
+*.log
+benchmarks/*.local.json
+

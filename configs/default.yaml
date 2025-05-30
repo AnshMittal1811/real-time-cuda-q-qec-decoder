@@ -1,0 +1,29 @@
+project:
+  name: real-time-cuda-q-qec-decoder
+  target_claim: "2.3x median decode latency reduction vs CPU baseline"
+
+surface_code:
+  distance: 5
+  rounds: 5
+  physical_error_rate: 0.005
+  noise_model: detector_level_depolarizing_with_measurement_noise
+
+decoder:
+  architecture: transformer
+  width: 128
+  layers: 4
+  heads: 4
+  dropout: 0.05
+  export_format: torchscript
+
+runtime:
+  language: c++17
+  gpu_backend:
+    cuda_q_qec: optional
+    cublas: optional
+    curand: optional
+  benchmark:
+    shots: 4096
+    batch_sizes: [1, 8, 32, 128]
+    report_percentiles: [50, 95, 99]
+
