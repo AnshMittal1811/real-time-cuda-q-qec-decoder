@@ -1,0 +1,14 @@
+{
+  "backend": "cpu",
+  "gpu_available": false,
+  "distance": 5,
+  "rounds": 5,
+  "physical_error_rate": 0.005,
+  "shots": 1024,
+  "logical_failures": 0,
+  "mean_decode_ms": 0.000429166,
+  "p50_decode_ms": 0.000401,
+  "p95_decode_ms": 0.000493,
+  "p99_decode_ms": 0.000602
+}
+

@@ -1,0 +1,15 @@
+{
+  "status": "schema-reference",
+  "claim": "2.3x median decode latency reduction vs CPU baseline is the target project result; rerun on a CUDA-Q workstation before treating it as measured evidence.",
+  "metrics": {
+    "cpu_baseline": {
+      "backend": "c++17-union-find-like",
+      "required": ["mean_decode_ms", "p50_decode_ms", "p95_decode_ms", "p99_decode_ms"]
+    },
+    "gpu_decoder": {
+      "backend": "cuda-q-cublas-curand-pytorch-export",
+      "required": ["mean_decode_ms", "p50_decode_ms", "p95_decode_ms", "p99_decode_ms", "speedup_vs_cpu"]
+    }
+  }
+}
+
