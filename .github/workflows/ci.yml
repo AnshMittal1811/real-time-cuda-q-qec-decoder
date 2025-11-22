@@ -1,0 +1,100 @@
+name: qec-decoder-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      shots:
+        description: "Benchmark shots for drift checks"
+        required: false
+        default: "512"
+      fail_on_drift:
+        description: "Fail if benchmark drift exceeds thresholds"
+        required: false
+        default: "false"
+
+env:
+  BENCHMARK_SHOTS: ${{ github.event.inputs.shots || '512' }}
+  FAIL_ON_DRIFT: ${{ github.event.inputs.fail_on_drift || 'false' }}
+  LATENCY_DRIFT_THRESHOLD: "0.35"
+  FAILURE_RATE_DRIFT_THRESHOLD: "0.02"
+
+jobs:
+  build-test-drift:
+    name: Build, test, and benchmark drift
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DQEC_BUILD_TESTS=ON
+
+      - name: Build C++ decoder
+        run: cmake --build build --parallel 2
+
+      - name: Run C++ smoke tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Run Python unit tests
+        run: PYTHONPATH=src/python python -m unittest discover -s tests
+
+      - name: Run C++ decoder benchmark
+        run: |
+          mkdir -p benchmarks/ci
+          ./build/qec_benchmark \
+            --distance 5 \
+            --rounds 5 \
+            --p 0.005 \
+            --shots "${BENCHMARK_SHOTS}" \
+            --seed 1337 \
+            > benchmarks/ci/cpp-current.json
+
+      - name: Run Python decoder benchmark
+        run: |
+          PYTHONPATH=src/python python -m qec_decoder.benchmark \
+            --distance 5 \
+            --rounds 5 \
+            --p 0.005 \
+            --shots "${BENCHMARK_SHOTS}" \
+            --seed 1337 \
+            > benchmarks/ci/python-current.json
+
+      - name: Compare C++ benchmark drift
+        run: |
+          python scripts/compare_benchmark_drift.py \
+            --baseline benchmarks/cpu_baseline.json \
+            --current benchmarks/ci/cpp-current.json \
+            --label "C++17 decoder baseline drift" \
+            --latency-threshold "${LATENCY_DRIFT_THRESHOLD}" \
+            --failure-rate-threshold "${FAILURE_RATE_DRIFT_THRESHOLD}" \
+            --output benchmarks/ci/cpp-drift.md \
+            $([ "${FAIL_ON_DRIFT}" = "true" ] && printf '%s' '--fail-on-drift' || true)
+          cat benchmarks/ci/cpp-drift.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Compare Python vs C++ decoder difference
+        run: |
+          python scripts/compare_benchmark_drift.py \
+            --baseline benchmarks/ci/cpp-current.json \
+            --current benchmarks/ci/python-current.json \
+            --label "Python decoder vs C++ decoder difference" \
+            --latency-threshold "12.0" \
+            --failure-rate-threshold "${FAILURE_RATE_DRIFT_THRESHOLD}" \
+            --output benchmarks/ci/python-vs-cpp-drift.md
+          cat benchmarks/ci/python-vs-cpp-drift.md >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Upload benchmark drift artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: qec-decoder-benchmark-drift
+          path: |
+            benchmarks/ci/*.json
+            benchmarks/ci/*.md

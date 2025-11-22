@@ -13,4 +13,4 @@ __pycache__/
 *.csv
 *.log
 benchmarks/*.local.json
-
+benchmarks/ci/
