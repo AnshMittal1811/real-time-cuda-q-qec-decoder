@@ -4,10 +4,6 @@ GPU-accelerated surface-code quantum error correction decoder prototype using a
 CUDA-Q-ready data model, C++17 runtime, optional cuBLAS/cuRAND hooks, and a PyTorch
 transformer decoder.
 
-> Timeline: May 2025-Dec 2025  
-> Target result: 2.3x median decode-latency reduction vs. a CPU baseline after running
-> the optional GPU/CUDA-Q path on a CUDA workstation.
-
 ## What This Implements
 
 This repository is a runnable implementation scaffold for a real-time QEC decoding loop:
