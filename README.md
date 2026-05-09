@@ -29,6 +29,88 @@ machines without CUDA-Q. The CUDA hooks and documentation show where CUDA-Q QEC 
 cuRAND noise generation, cuBLAS-backed dense inference, and TorchScript/LibTorch inference
 fit into the production GPU path.
 
+## Project Perspective
+
+The project is trying to treat quantum error correction decoding as a real-time systems
+problem instead of only an offline decoding or model-accuracy exercise. In a fault-tolerant
+quantum computing stack, the decoder sits in the feedback loop between noisy stabilizer
+measurements and the correction policy. That means the useful result is not just a lower
+logical-error rate in isolation; it is a decoder that can consume a syndrome stream,
+produce correction/risk decisions with bounded tail latency, and stay measurable as the
+noise model, code distance, and backend change.
+
+From that perspective, this repository is organized around four engineering questions:
+
+1. Can surface-code syndrome data be represented with a stable detector-level schema that
+   works for local simulation, CUDA-Q sampling, C++ inference, Python training, and CI?
+2. Can the classical decoder path be kept close to real-time deployment constraints,
+   including ring-buffer-friendly C++17 execution and p50/p95/p99 latency reporting?
+3. Can a compact neural decoder be trained and exported without breaking the same runtime
+   contract used by deterministic baselines?
+4. Can benchmark drift be tracked continuously so changes to the simulator, model, runtime,
+   or hardware do not silently invalidate the latency and correctness claims?
+
+The result is a project scaffold for comparing decoder choices under one reproducible
+interface: deterministic C++ baseline, Python baseline, transformer decoder, and optional
+GPU/CUDA-Q acceleration points.
+
+## What This Suggests
+
+This work suggests that QEC decoder evaluation should be framed as a systems benchmark,
+not only as an algorithm benchmark. A decoder that looks strong offline can still be
+unsuitable for real-time feedback if it adds unpredictable preprocessing, host/device
+copies, or tail-latency spikes. Conversely, a simpler decoder can be operationally useful
+if it is stable, measurable, and easy to place in a larger control loop.
+
+The repository therefore emphasizes:
+
+- **Latency as a first-class metric:** every benchmark reports median and tail latency,
+  not only aggregate throughput.
+- **Backend-swappable syndrome generation:** the downstream decoder accepts the same
+  detector-level format whether data comes from the local simulator or a CUDA-Q source.
+- **A neural/runtime bridge:** the PyTorch transformer path is shaped so it can be exported
+  and compared against C++ inference paths instead of remaining a notebook-only model.
+- **Continuous drift visibility:** CI records benchmark changes so decoder quality and
+  latency regressions are visible during normal development.
+
+## How This Can Be Leveraged Later
+
+The current implementation is intentionally small enough to run locally, but it is designed
+to become a larger QEC experimentation and deployment harness:
+
+- Replace the local syndrome generator with CUDA-Q QEC sampling, hardware traces, or
+  external detector-error-model data while preserving the same JSON/runtime schema.
+- Swap the compact transformer with graph neural decoders, neural belief propagation,
+  minimum-weight perfect matching, union-find variants, or TensorRT-optimized models.
+- Move preprocessing, bit packing, and inference into a fully GPU-resident path to measure
+  the real cost of avoiding host/device synchronization in the feedback loop.
+- Use the benchmark-drift workflow on a self-hosted GPU runner to gate decoder releases
+  against latency, tail-latency, and logical-failure thresholds.
+- Extend the metrics into an experiment dashboard for distance scaling, physical error
+  rate sweeps, model-size sweeps, and hardware/backend comparisons.
+
+## Novelty Boundary
+
+This repository does **not** claim that surface-code decoding, neural QEC decoders,
+transformer models, CUDA acceleration, or CUDA-Q simulation are individually new. Those are
+active areas with substantial prior work. The novelty of this project is the integration
+boundary and evaluation discipline:
+
+- a CUDA-Q-ready detector schema that keeps simulation, training, C++ benchmarking, and
+  future GPU inference aligned;
+- a real-time-oriented C++17 runtime surface instead of a purely research-script decoder;
+- a direct bridge between PyTorch transformer training/export and a deployment-style
+  decoder contract;
+- benchmark drift checks in CI so latency and correctness changes are treated as part of
+  the software lifecycle;
+- an explicit path to compare CPU, Python, neural, and GPU-resident decoder variants under
+  the same surface-code workload.
+
+In other words, the differentiator is not a single isolated algorithm. It is the
+production-shaped QEC decoder scaffold: one place where syndrome generation, neural
+decoding, C++ runtime constraints, CUDA hooks, benchmark methodology, and CI drift control
+are tied together so later work can make defensible claims about real-time QEC performance.
+
 ## Repository Layout
 
 ```text
