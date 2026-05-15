@@ -29,6 +29,27 @@ machines without CUDA-Q. The CUDA hooks and documentation show where CUDA-Q QEC 
 cuRAND noise generation, cuBLAS-backed dense inference, and TorchScript/LibTorch inference
 fit into the production GPU path.
 
+## Primer: Surface Codes and QEC Decoders
+
+Quantum Error Correction (QEC) is essential for building large-scale, reliable quantum
+computers. Because physical qubits are inherently noisy and prone to decoherence, we
+cannot use them directly for long computations. **Surface Codes** are a leading class of
+topological quantum error-correcting codes that allow us to build "logical" qubits out of
+a 2D lattice of noisy physical qubits.
+
+In a surface code, we don't measure the state of the data qubits directly (which would
+collapse the quantum information). Instead, we perform periodic **parity measurements**
+(stabilizers) on groups of neighboring qubits. These measurements produce a stream of
+binary data called **syndromes**. If an error occurs on a physical qubit, it changes the
+observed parity of nearby stabilizers, creating "defects" in the syndrome stream.
+
+The role of the **Decoder** is to take this syndrome data and infer the most likely set
+of physical errors that caused the observed defects. This is a complex pattern-matching
+problem that must be solved in **real-time**: if the decoder is too slow, errors will
+accumulate faster than they can be tracked, eventually leading to a "logical failure"
+where the quantum information is lost. This project focuses on using GPU acceleration and
+compact neural models to meet these strict real-time decoding constraints.
+
 ## Project Perspective
 
 The project is trying to treat quantum error correction decoding as a real-time systems
@@ -315,6 +336,27 @@ The GPU/CUDA-Q build was not run on this machine because `nvcc` is not installed
 | October 2025 | Evaluation | Python and C++ benchmark harnesses |
 | November 2025 | Demo hardening | Scripts, configs, architecture documentation |
 | December 2025 | Final package | README, timeline, GitHub-ready repository |
+
+## Future Work & Optimization Roadmap (2026+)
+
+This roadmap outlines the integration of advanced CUDA and ML optimizations (pioneered in
+the `250DaysStraight` project) to push the decoder toward production-grade performance
+and scalability.
+
+- **Jan 18, 2026 - TensorRT & Mixed Precision Inference:** Port the transformer decoder to
+  TensorRT using custom INT4/FP8 Triton kernels to achieve sub-millisecond tail latencies.
+- **Feb 07, 2026 - Asynchronous TMA Syndrome Ingestion:** Implement PTX `mbarrier` syncs and
+  Tensor Memory Accelerator (TMA) for zero-copy, asynchronous loading of syndrome tensors
+  from the detector stream.
+- **May 10, 2026 - Scalable Attention for High Distances:** Integrate sliding-tile and
+  striped attention mechanisms to support real-time decoding for code distances $d \ge 11$,
+  where standard transformers become computationally bound.
+- **May 11, 2026 - End-to-End CUDA Graph Execution:** Freeze the entire preprocessing,
+  inference, and correction application phases into a single executable CUDA graph to
+  minimize launch overhead and jitter.
+- **May 12, 2026 - CUDA-Q Native Backend & RLHF Tuning:** Finalize the direct CUDA-Q QEC
+  sampling hook and begin fine-tuning the model against dynamic noise models using
+  curriculum RLHF.
 
 ## Resume Summary
 
