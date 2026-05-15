@@ -1,0 +1,57 @@
+site_name: Real-Time CUDA-Q QEC Decoder
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.footer
+    - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: deep purple
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+markdown_extensions:
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - tables
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Timeline: timeline.md
+  - Quantum Computing:
+    - Qubits (Creation & Types): quantum_computing/qubits.md
+    - The Bloch Sphere: quantum_computing/bloch_sphere.md
+    - Bra-Ket Notation: quantum_computing/bra_ket.md
+    - Quantum Mechanics: quantum_computing/quantum_mechanics.md
+    - Quantum Tunnelling: quantum_computing/quantum_tunnelling.md
+    - Quantum Error Correction: quantum_computing/qec.md
+    - Quantum Libraries: quantum_computing/libraries.md
+  - Quantum Machine Learning:
+    - Introduction to QML: qml/introduction.md
+    - Convergence Timeline: qml/timeline.md
+    - Quantum AI: qml/quantum_ai.md
+  - Project Connection: project_connection.md
