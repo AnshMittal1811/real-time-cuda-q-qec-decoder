@@ -2,6 +2,7 @@ import os
 
 files = {
     "mkdocs.yml": """site_name: Real-Time CUDA-Q QEC Decoder
+site_url: https://AnshMittal1811.github.io/real-time-cuda-q-qec-decoder/
 theme:
   name: material
   features:
