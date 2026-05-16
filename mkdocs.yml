@@ -1,5 +1,8 @@
 site_name: Real-Time CUDA-Q QEC Decoder
 site_url: https://AnshMittal1811.github.io/real-time-cuda-q-qec-decoder/
+repo_url: https://github.com/AnshMittal1811/real-time-cuda-q-qec-decoder
+repo_name: AnshMittal1811/real-time-cuda-q-qec-decoder
+edit_uri: edit/main/docs/
 theme:
   name: material
   features:
