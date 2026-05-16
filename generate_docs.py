@@ -3,6 +3,9 @@ import os
 files = {
     "mkdocs.yml": """site_name: Real-Time CUDA-Q QEC Decoder
 site_url: https://AnshMittal1811.github.io/real-time-cuda-q-qec-decoder/
+repo_url: https://github.com/AnshMittal1811/real-time-cuda-q-qec-decoder
+repo_name: AnshMittal1811/real-time-cuda-q-qec-decoder
+edit_uri: edit/main/docs/
 theme:
   name: material
   features:
@@ -41,6 +44,12 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
   - Home: index.md
@@ -54,11 +63,85 @@ nav:
     - Quantum Tunnelling: quantum_computing/quantum_tunnelling.md
     - Quantum Error Correction: quantum_computing/qec.md
     - Quantum Libraries: quantum_computing/libraries.md
-  - Quantum Machine Learning:
-    - Introduction to QML: qml/introduction.md
-    - Convergence Timeline: qml/timeline.md
-    - Quantum AI: qml/quantum_ai.md
+  - Quantum Generative AI Hub: qml/generative_quantum_ai.md
   - Project Connection: project_connection.md""",
+    "docs/javascripts/mathjax.js": """window.MathJax = {
+  tex: {
+    inlineMath: [["\\\\(", "\\\\)"]],
+    displayMath: [["\\\\[", "\\\\]"]],
+    processEscapes: true,
+    processEnvironments: true
+  },
+  options: {
+    ignoreHtmlClass: ".*|",
+    processHtmlClass: "arithmatex"
+  }
+};""",
+    "docs/qml/generative_quantum_ai.md": """# Unified Quantum Generative AI Research Hub
+
+This page consolidates cutting-edge research into Quantum Generative AI, bridging the gap between real-time Quantum Error Correction (QEC) and generative modeling techniques like Diffusion, NeRFs, and LLMs.
+
+---
+
+## 1. Quantum Diffusion Models (QDM)
+*Based on: arXiv:2311.15444v1*
+
+Quantum Diffusion Models replace classical Artificial Neural Networks (ANNs) with **Parameterized Quantum Circuits (PQCs)** to perform the denoising process directly on quantum states.
+
+- **Core Mechanism:** A forward Markov chain adds noise classically, while a PQC is trained to approximate the reverse (denoising) trajectory.
+- **Key Advantage:** Direct manipulation of quantum state amplitudes $|x_t\\rangle \rightarrow |x_{t-1}\\rangle$ allows for generating distributions with features that scale exponentially with the number of qubits.
+- **Performance:** Successfully demonstrated on MNIST, achieving high-quality sample generation on NISQ devices with fewer parameters than classical counterparts.
+
+## 2. Quantum Radiance Fields (QRF)
+*Based on: arXiv:2211.03418*
+
+Applying Quantum Computing to the challenge of photorealistic rendering.
+
+- **Innovation:** QRF utilizes quantum circuits and quantum volume rendering to represent 3D scenes implicitly.
+- **Quantum Speedup:** Exploits quantum parallelism to handle the intensive numerical integration required for ray tracing.
+- **Non-linearity:** Leverages higher-order quantum non-linearity to capture high-frequency scene details that traditional NeRFs often struggle with.
+
+## 3. Quantum Gaussian Splatting (QGS)
+*Based on: QuantumGS Repository*
+
+Integrating quantum-enhanced optimization with 3D Gaussian Splatting.
+
+- **Approach:** Utilizing quantum search or variational algorithms to optimize the parameters (position, covariance, opacity) of 3D Gaussians.
+- **Impact:** Potentially reduces the time-to-convergence for complex scene reconstructions by leveraging quantum-classical hybrid optimization loops.
+
+## 4. Quantum Variational Autoencoders (QVAE)
+*Based on: arXiv:1802.05779*
+
+Generative modeling where the latent space is governed by quantum dynamics.
+
+- **Mechanism:** Implements the latent generative process using a **Quantum Boltzmann Machine (QBM)**.
+- **Sampling:** Uses quantum computers as effective sampling devices within the latent space, maximizing a "quantum" lower bound to the log-likelihood.
+
+## 5. Quantum Large Language Models (QLLM)
+*Based on: arXiv:2602.05047v1*
+
+Scaling quantum attention mechanisms for natural language processing.
+
+- **Concept:** Replacing classical attention matrices with quantum kernels to capture long-range dependencies in text using Hilbert space embeddings.
+- **Future Integration:** Bridging the transformer decoder used in our **Real-Time QEC Decoder** with quantum-native transformer blocks.
+
+---
+
+## Technical Integration with Real-Time QEC
+The research into Quantum Generative AI is directly relevant to the `real-time-cuda-q-qec-decoder` project in several ways:
+
+1. **Synthetic Syndrome Generation:** Quantum Diffusion and QVAEs can be used to generate high-fidelity, synthetic QEC syndrome data to train more robust neural decoders.
+2. **Hybrid Inference:** Our project's use of PyTorch Transformer Decoders serves as a bridge; as QLLMs mature, the classical blocks can be swapped for quantum-native kernels.
+3. **GPU-Quantum Synergy:** Much like QRF and QGS rely on NVIDIA GPU acceleration for rasterization, our decoder utilizes **CUDA-Q** to align real-time decoding with quantum state preparation.
+
+### Mathematical Framework
+Quantum states are represented in Dirac notation:
+\\\\[ |\\\\psi\\\\rangle = \\\\alpha|0\\\\rangle + \\\\beta|1\\\\rangle \\\\]
+
+The infidelity loss used in training our PQC models is defined as:
+\\\\[ L(\\\\theta) = 1 - E[F(\\\\hat{P}(\\\\theta, t)|x_{t+1}\\\\rangle, |x_t\\\\rangle)] \\\\]
+where $F$ is the quantum fidelity.
+""",
     "docs/quantum_computing/qubits.md": """# Qubits: The Building Blocks of Quantum Computing
 
 ## What is a Qubit?
@@ -90,32 +173,30 @@ There are several leading physical implementations for qubits:
 The **Bloch sphere** is a geometrical representation of the pure state space of a two-level quantum mechanical system (a qubit).
 
 ## Visualizing Quantum States
-- The North Pole represents the classical state $|0\\rangle$.
-- The South Pole represents the classical state $|1\\rangle$.
+- The North Pole represents the classical state \\\\(|0\\\\rangle\\\\).
+- The South Pole represents the classical state \\\\(|1\\\\rangle\\\\).
 - The surface of the sphere represents all possible pure states (superpositions) of the qubit.
 
-```math
-|\\psi\\rangle = \\cos(\\theta/2)|0\\rangle + e^{i\\phi}\\sin(\\theta/2)|1\\rangle
-```
+\\\\[ |\\\\psi\\\\rangle = \\\\cos(\\\\theta/2)|0\\\\rangle + e^{i\\\\phi}\\\\sin(\\\\theta/2)|1\\\\rangle \\\\]
 
 When quantum operations (gates) are applied to a qubit, they can be visualized as rotations around the axes (X, Y, Z) of the Bloch sphere.""",
     "docs/quantum_computing/bra_ket.md": """# Mathematical Notation (Bra-Ket)
 
 **Dirac notation**, or **Bra-Ket notation**, is the standard mathematical language for quantum mechanics.
 
-- **Ket $|\\psi\\rangle$**: Represents a column vector, denoting a quantum state.
-- **Bra $\\langle\\psi|$**: Represents a row vector (the complex conjugate transpose of the Ket).
-- **Inner Product (Bra-Ket) $\\langle\\phi|\\psi\\rangle$**: The dot product of two states, representing the probability amplitude of state $\\psi$ collapsing into state $\\phi$.
+- **Ket $|\\\\psi\\\\rangle$**: Represents a column vector, denoting a quantum state.
+- **Bra $\\\\langle\\\\psi|$**: Represents a row vector (the complex conjugate transpose of the Ket).
+- **Inner Product (Bra-Ket) $\\\\langle\\\\phi|\\\\psi\\\\rangle$**: The dot product of two states, representing the probability amplitude of state $\\\\psi$ collapsing into state $\\\\phi$.
 
 ### Standard Basis
 The computational basis states are defined as:
-- $|0\\rangle = \\begin{bmatrix} 1 \\\\ 0 \\end{bmatrix}$
-- $|1\\rangle = \\begin{bmatrix} 0 \\\\ 1 \\end{bmatrix}$
+- $|0\\\\rangle = \\\\begin{bmatrix} 1 \\\\\\\\ 0 \\\\end{bmatrix}$
+- $|1\\\\rangle = \\\\begin{bmatrix} 0 \\\\\\\\ 1 \\\\end{bmatrix}$
 
 ### Superposition
 A general qubit state is written as a linear combination of basis states:
-$|\\psi\\rangle = \\alpha|0\\rangle + \\beta|1\\rangle$
-where $|\\alpha|^2 + |\\beta|^2 = 1$.""",
+$|\\\\psi\\\\rangle = \\\\alpha|0\\\\rangle + \\\\beta|1\\\\rangle$
+where $|\\\\alpha|^2 + |\\\\beta|^2 = 1$.""",
     "docs/quantum_computing/quantum_mechanics.md": """# Quantum Mechanics Principles
 
 Understanding quantum computing requires grasping three core phenomena of quantum mechanics:
@@ -181,15 +262,6 @@ timeline
         2024 : Microsoft Topological Qubit Breakthroughs
         2025 : Google TurboQuant & Expansions in Quantum AI
 ```""",
-    "docs/qml/quantum_ai.md": """# Quantum AI and its Subtopics
-
-As quantum hardware matures, Quantum AI explores replacing classical neural network architectures with quantum equivalents.
-
-### Subtopics
-1. **Quantum Generative Adversarial Networks (QGANs):** Using quantum circuits as the generator to produce quantum data (or classical data encoded in quantum states), while a classical or quantum discriminator tries to distinguish them from real data.
-2. **Quantum Convolutional Neural Networks (QCNNs):** Adapting the concept of local receptive fields and pooling layers to quantum circuits to analyze quantum states or encoded images, highly useful for quantum phase recognition.
-3. **Quantum Reinforcement Learning (QRL):** A quantum agent interacts with a classical or quantum environment. Quantum superposition allows the agent to explore multiple actions simultaneously, theoretically speeding up the learning of optimal policies.
-4. **Google TurboQuant:** Google advancements in highly optimized, massive-scale quantum chemistry and physics simulations, bridging classical AI with quantum state representations to discover new materials and drugs.""",
     "docs/project_connection.md": """# Tying It All Together: Research & Real-Time QEC
 
 How does the `real-time-cuda-q-qec-decoder` fit into the broader landscape of Machine Learning, GPUs, and Quantum Computing?

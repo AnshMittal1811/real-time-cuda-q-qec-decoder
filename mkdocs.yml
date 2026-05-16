@@ -41,6 +41,12 @@ markdown_extensions:
   - tables
   - toc:
       permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
 nav:
   - Home: index.md
@@ -54,8 +60,5 @@ nav:
     - Quantum Tunnelling: quantum_computing/quantum_tunnelling.md
     - Quantum Error Correction: quantum_computing/qec.md
     - Quantum Libraries: quantum_computing/libraries.md
-  - Quantum Machine Learning:
-    - Introduction to QML: qml/introduction.md
-    - Convergence Timeline: qml/timeline.md
-    - Quantum AI: qml/quantum_ai.md
+  - Quantum Generative AI Hub: qml/generative_quantum_ai.md
   - Project Connection: project_connection.md
